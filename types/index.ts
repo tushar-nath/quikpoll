@@ -12,3 +12,9 @@ export interface IPoll extends Document {
   options: { text: string; votes: number }[]
   createdBy: IUser['_id']
 }
+
+export interface IMessage extends Document {
+  text: string
+  name: string
+  socketID: string
+}

@@ -8,6 +8,8 @@ import healthRoute from '../routes/healthRoute'
 import userRoutes from '../routes/userRoutes'
 import pollRoutes from '../routes/pollRoutes'
 import { createServer } from 'http'
+import messageRoutes from '../routes/messageRoutes'
+import { MessageService } from '../services/messageService'
 
 dotenv.config()
 
@@ -35,6 +37,7 @@ app.use(bodyParser.json({ limit: AppConfig.BODY_PARSER_LIMIT }))
 app.use('/api/healthcheck', healthRoute)
 app.use('/api/users', userRoutes)
 app.use('/api/polls', pollRoutes)
+app.use('/api/messages', messageRoutes)
 
 const PORT = process.env.PORT || 4000
 const httpServer = createServer(app)
@@ -49,13 +52,19 @@ let users: any = []
 
 socketIO.on('connection', (socket: any) => {
   console.log(`⚡: ${socket.id} user just connected!`)
-  socket.on('message', (data: any) => {
-    socketIO.emit('messageResponse', data)
+
+  socket.on('message', async (data: any) => {
+    const message = await MessageService.saveMessage(
+      data.text,
+      data.name,
+      data.socketID
+    )
+    socket.broadcast.emit('messageResponse', message)
   })
 
-  socket.on('typing', (data: any) =>
+  socket.on('typing', (data: any) => {
     socket.broadcast.emit('typingResponse', data)
-  )
+  })
 
   socket.on('newUser', (data: { username: string }) => {
     users = users.filter((user: any) => user.socketID !== socket.id)
