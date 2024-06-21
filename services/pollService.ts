@@ -23,13 +23,17 @@ export class PollService {
     }
   }
 
-  static async vote(pollId: string, optionIndex: number): Promise<void> {
+  static async vote(
+    pollId: string,
+    optionIndex: number
+  ): Promise<IPoll | null> {
     try {
       await clientPromise
       const poll = await Poll.findById(pollId)
       if (!poll) throw new Error('Poll not found')
       poll.options[optionIndex].votes += 1
-      await poll.save()
+      const updatedPoll = await poll.save()
+      return updatedPoll
     } catch (error: any) {
       console.error('Error:', error)
       throw error

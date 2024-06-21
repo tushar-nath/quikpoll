@@ -16,8 +16,8 @@ export class Polls {
   static async vote(req: Request, res: Response) {
     try {
       const { pollId, optionIndex } = req.body
-      await PollService.vote(pollId, optionIndex)
-      res.status(200).json({ message: 'Vote counted' })
+      const poll = await PollService.vote(pollId, optionIndex)
+      res.status(200).json({ poll })
     } catch (error: any) {
       console.error('Error:', error)
       res.status(400).json({ error: error.message })

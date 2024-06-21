@@ -10,6 +10,7 @@ import pollRoutes from '../routes/pollRoutes'
 import { createServer } from 'http'
 import messageRoutes from '../routes/messageRoutes'
 import { MessageService } from '../services/messageService'
+import { PollService } from '../services/pollService'
 
 dotenv.config()
 
@@ -44,7 +45,7 @@ const httpServer = createServer(app)
 
 const socketIO = require('socket.io')(httpServer, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.REACT_CLIENT_URL,
   },
 })
 
@@ -75,6 +76,15 @@ socketIO.on('connection', (socket: any) => {
     })
 
     socketIO.emit('newUserResponse', users)
+  })
+
+  socket.on('vote', async (data: any) => {
+    try {
+      const updatedPoll = await PollService.vote(data.pollId, data.optionIndex)
+      socketIO.emit('pollUpdate', updatedPoll)
+    } catch (error) {
+      console.error('Error handling vote:', error)
+    }
   })
 
   socket.on('disconnect', () => {
