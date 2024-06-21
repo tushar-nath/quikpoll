@@ -1,8 +1,8 @@
-import { Router } from 'express';
-import { Messages } from '../handlers/messageHandler';
+import { Router } from 'express'
+import { Messages } from '../handlers/messageHandler'
 
-const router = Router();
+const router = Router()
 
-router.get('/', Messages.getMessages);
+router.get('/', Messages.getMessages)
 
-export default router;
+export default router
